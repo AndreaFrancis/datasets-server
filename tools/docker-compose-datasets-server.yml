@@ -87,7 +87,7 @@ services:
     depends_on:
       - mongodb
     restart: always
-  worker-split-names:
+  worker-split-names-from-streaming:
     build:
       context: ..
       dockerfile: services/worker/Dockerfile
@@ -100,7 +100,7 @@ services:
       file: docker-compose-base.yml
       service: datasets-worker
     environment:
-      WORKER_ONLY_JOB_TYPES: "/split-names" # hard-coded
+      WORKER_ONLY_JOB_TYPES: "/split-names-from-streaming" # hard-coded
     depends_on:
       - mongodb
     restart: always
@@ -197,6 +197,23 @@ services:
       service: datasets-worker
     environment:
       WORKER_ONLY_JOB_TYPES: "/dataset-info" # hard-coded
+    depends_on:
+      - mongodb
+    restart: always
+  worker-split-names-from-dataset-info:
+    build:
+      context: ..
+      dockerfile: services/worker/Dockerfile
+    volumes:
+      - assets:${ASSETS_STORAGE_DIRECTORY-/assets}:rw
+      - splits-datasets-cache:${HF_DATASETS_CACHE-/datasets-cache}:rw
+      - splits-modules-cache:${HF_DATASETS_CACHE-/modules-cache}:rw
+      - splits-numba-cache:${NUMBA_CACHE_DIR-/numba-cache}:rw
+    extends:
+      file: docker-compose-base.yml
+      service: datasets-worker
+    environment:
+      WORKER_ONLY_JOB_TYPES: "/split-names-from-dataset-info" # hard-coded
     depends_on:
       - mongodb
     restart: always
